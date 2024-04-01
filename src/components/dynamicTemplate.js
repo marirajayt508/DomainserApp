@@ -1,5 +1,5 @@
 import React,{useState,useEffect} from 'react';
-import { Checkbox, Radio, message, Input, Button } from "antd";
+import { Switch, message, Input, Table } from "antd";
 import axios from 'axios';
 import { api } from '../util';
 
@@ -11,16 +11,6 @@ export default function DynamicTemplate ()
       fetchData();
     }, []);
 
-    let setup = [
-        {
-            appLabel : "CUSTOM INPUT",
-            appKey : "custom_input"
-        },
-        {
-            appLabel : "COUNTRY SORTING",
-            appKey : "country_sorting"
-        }
-    ]
 
     const fetchData = async () => {
         message.loading("Loading...")
@@ -34,73 +24,64 @@ export default function DynamicTemplate ()
         }
       };
 
-      const getItems = ({appLabel,appKey}) => {
-if(data)
-{
+      const getItems = () => {
+        const item = [{
+            label: "Doposit",
+            code: 'deposit'
+        },
+        {
+            label: "Withdrawl",
+            code: 'withdrawl'
+        }
+    ]
     return <>
     <div>
-    <p>{appLabel}</p>
-    {data.payment.deposit.map((items,h)=>{
-       return items[appKey].map((inputs,i)=>{
-            return <div  key={i}>
-                {appKey.toLowerCase().includes(setup[0].appKey) ?
-            getInput(inputs)
-            :
-            sortCountry(inputs,h,i)    
-            }
-            </div>
-        })
-})}
+      {
+        item.map((v)=>{
+            return sortCountry(v)    
+            })
+      }
 </div>
     </>
 }
-      };
+
 
 //ONLY INPUT, OPTIONS, CHECK TYPE WILL WORKS
 
-const getInput = (input)=>{
-   return <>
-   {
-    input.type.toLowerCase().includes('options') && <div>
-     <Radio></Radio>
-    <label>{input.label}</label>
-    </div>
-   }
-   {
-    input.type.toLowerCase().includes('text') && <div>
-        <label>{input.label}</label><br/>
-        <Input style={{width : '20%'}}/>
-    </div>
-   }
-   {
-    input.type.toLowerCase().includes('check') && <div>
-        <Checkbox>{input.label}</Checkbox>
-    </div>
-   }
-   </>;
-}
+const  columns = [
+    {
+      title: 'Sort',
+      dataIndex: 'sort',
+      key: 'sort',
+    },
+    {
+      title: 'Country',
+      dataIndex: 'country',
+      key: 'country',
+      render : (text,i)=>{
+        console.log(text)
+        return <Input defaultValue={text} style={{width : '20%'}}/>     
+      }
+    },
+    {
+      title: 'Action',
+      dataIndex: 'action',
+      key: 'action',
+      render : (text,i,h,s)=>{
+        console.log(text,i,h,s)
+        return <Switch defaultChecked={text} />
+      }
+    },]
 
-const sortCountry = (obj,h,i)=>{
-    return <Checkbox onChange={(e)=>{changeAction(e,h,i)}} defaultChecked={obj.action}>{obj.country}</Checkbox>;
-}
 
-const changeAction = (v,h,i)=>{
- data.payment.deposit[h].country_sorting[i].action=v.target.checked
- setData(data)
-}
-
-const show = ()=>{
-    console.log(data)
+const sortCountry = (i)=>{
+    
+    return<>
+    <p>{i.label}</p>
+    <Table columns={columns} dataSource={data?.payment[i.code][0].country_sorting} code={i.code} />
+    </> 
 }
     return <>
-{setup.map((setup_obj,i)=>{
-    return <div key={i}>
-        { getItems(setup_obj)}
-    </div>
-})}
-<br/>
-        <Button onClick={()=>show()} type="primary" danger>
-            Click to View Object In Console
-        </Button>
+        { getItems()}
     </>
 }

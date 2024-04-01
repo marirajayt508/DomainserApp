@@ -45,9 +45,6 @@ export default function DynamicTemplate ()
     </>
 }
 
-
-//ONLY INPUT, OPTIONS, CHECK TYPE WILL WORKS
-
 const  columns = [
     {
       title: 'Sort',
@@ -64,14 +61,15 @@ const  columns = [
       }
     },
     {
-      title: 'Action',
-      dataIndex: 'action',
-      key: 'action',
-      render : (text,i,h,s)=>{
-        console.log(text,i,h,s)
-        return <Switch defaultChecked={text} />
-      }
-    },]
+        title: 'Action',
+        dataIndex: 'action',
+        key: 'action',
+        render: (text, record, index) => {
+          console.log(text, record); // Check the structure of record
+          console.log('Code:', record.code); // Check if code is accessible
+          return <Switch defaultChecked={text} />;
+        },
+      },,]
 
 
 const sortCountry = (i)=>{
